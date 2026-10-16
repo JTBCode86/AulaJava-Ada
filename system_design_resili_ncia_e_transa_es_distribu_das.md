@@ -210,3 +210,4 @@ Para homologar a resiliência do ambiente antes da entrada em produção, o pipe
    - Enviar a mesma mensagem de `PagamentoConfirmadoEvent` três vezes seguidas para o tópico do Kafka e verificar se o estoque é reduzido apenas uma vez.
 3. **Validação de Recuperação na DLQ:**
    - Forçar uma falha sintática (*poison pill*) em uma mensagem de compensação e verificar se ela é movida com sucesso para a DLQ sem travar o processamento dos demais itens da partição.
+   
