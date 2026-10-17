@@ -1,0 +1,28 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: checkout-resilience-service
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      paymentService:
+        registerHealthIndicator: true
+        slidingWindowSize: 5                    # Janela de avaliação (últimas 5 chamadas)
+        failureRateThreshold: 50.0              # Abre se 50% falharem
+        slowCallRateThreshold: 50.0
+        slowCallDurationThreshold: 2s           # Considera lento se passar de 2 segundos
+        waitDurationInOpenState: 10s            # Tempo com o circuito aberto antes de testar de novo
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToEnabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, circuitbreakers
+  health:
+    circuitbreakers:
+      enabled: true
