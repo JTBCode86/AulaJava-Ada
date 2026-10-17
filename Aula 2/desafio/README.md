@@ -71,9 +71,9 @@ curl -X POST "http://localhost:8080/checkout?valor=250.00"
 
 * **Comportamento: Ao atingir o limiar de falhas configurado, o Circuit Breaker mudará o estado para OPEN, rejeitando chamadas futuras instantaneamente com a mensagem:**
 > 
-	⚠️ 	CircuitBreaker 'paymentService' is OPEN and does not permit further calls
+	⚠️ CircuitBreaker 'paymentService' is OPEN and does not permit further calls
 ---
 
 👨‍💻 Autor
 
-* **Desenvolvido por Jean Barbosa como parte dos estudos avançados em engenharia de software e arquitetura distribuída.
+* Desenvolvido por Jean Barbosa como parte dos estudos avançados em engenharia de software e arquitetura distribuída.
