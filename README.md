@@ -61,7 +61,7 @@ git clone [https://github.com/JTBCode86/AulaJava-Ada.git](https://github.com/JTB
 
 ```Bash
 
-cd AulaJava-Ada/"Aula 4"
+cd AulaJava-Ada/"Aula x"
 
 ```
 
