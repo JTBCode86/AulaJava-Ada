@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: pk-benchmark-demo
+  datasource:
+    url: jdbc:postgresql://localhost:5432/pkdemo
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          batch_size: 1000
+          order_inserts: true
