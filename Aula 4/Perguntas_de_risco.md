@@ -1,4 +1,4 @@
-# Perguntas de Risco & Análise de Falhas em Transações Distribuídas (Aula 04)
+# Aula 04 - Perguntas de Risco & Análise de Falhas em Transações Distribuídas 
 
 > **Cenário de Engenharia:** Marketplace de Alta Vazão (5.000 TPS) na Black Friday com bancos autônomos por microsserviço (Checkout, Pagamento e Estoque).
 
