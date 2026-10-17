@@ -63,9 +63,9 @@ Para garantir a tolerância a falhas e o tratamento adequado de mensagens com er
 	docker-compose logs -f app
 	```
 
-### Resultados Práticos dos Testes Executados:
+# Resultados Práticos dos Testes Executados
 
-# Cenário 1: Fluxo Feliz (SAGA + CQRS de Sucesso)
+## Cenário 1: Fluxo Feliz (SAGA + CQRS de Sucesso)
 Neste cenário, um pedido é criado com sucesso, passa pelo processamento de pagamento assíncrono e consolida seu estado final como COMPLETED.
 	
 1. Requisição de Comando (POST)
@@ -108,7 +108,7 @@ Resposta:
 2026-03-31T01:15:10.425Z  INFO 1 --- [ry-listener-0-1] c.e.saga.query.OrderQueryProjector     : [CQRS] Atualizando visão de leitura do pedido 958acac7-7365-49f5-aef8-7f493e99022c -> Status: COMPLETED
 ```
 	
-### Cenário 2: Fluxo de Falha (Retry + DLQ)
+## Cenário 2: Fluxo de Falha (Retry + DLQ)
 Neste cenário, simula-se um erro de processamento de pagamento. A aplicação executa retries com re-seeking de offset do Kafka e, após esgotar as tentativas, encaminha a mensagem para a Dead Letter Queue.
 	
 1. Requisição de Comando com Erro Simulado (POST).
