@@ -1,4 +1,4 @@
-# System Design: Aula 02 - APIs Resilientes e Integração de Checkout
+# System Design - Aula 02: APIs Resilientes e Integração de Checkout
 
 > **Contexto:** Projeto de integração da API de Checkout com gateway de pagamento externo sob alta concorrência (10.000 usuários simultâneos)[cite: 15].
 

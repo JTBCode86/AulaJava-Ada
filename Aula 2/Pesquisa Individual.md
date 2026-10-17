@@ -1,4 +1,4 @@
-# 🔬 Pesquisa Individual: APIs REST Resilientes & Arquitetura
+# 🔬 Pesquisa Individual — Aula 02: APIs REST Resilientes & Arquitetura
 
 > **Aula 02 - Java PE-JV-003 | Ada Tech**
 > **Tema:** Análise de Paradigmas de Concorrência, Mecanismos de Resiliência e Estratégia de Testes contra Falhas Externas.
