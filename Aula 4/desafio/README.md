@@ -43,8 +43,8 @@ Para garantir a tolerância a falhas e o tratamento adequado de mensagens com er
 
  **Clonar o Repositório**
    ```bash
-   git clone [https://github.com/usuario/projeto-saga-cqrs-kafka.git](https://github.com/usuario/projeto-saga-cqrs-kafka.git)
-   cd projeto-saga-cqrs-kafka
+   git clone [https://github.com/JTBCode86/AulaJava-Ada.git]
+   cd AulaJava-Ada\Aula 4\desafio\saga-cqrs-dlq-demo\
    ```
 
 1. **Subir a Infraestrutura e Aplicação via Docker Compose**
