@@ -1,4 +1,4 @@
-# Documento de System Design: Transações Distribuídas & Resiliência em Alta Escala
+# Documento de System Design: Aula 04 - Transações Distribuídas & Resiliência em Alta Escala
 
 > **Escopo do Documento:**
 > Este documento especifica a arquitetura de solução para o **Incidente da Black Friday**, garantindo consistência transacional entre os serviços autônomos de **Checkout**, **Pagamento** e **Estoque** sob altíssimo throughput de acessos concorrentes.
