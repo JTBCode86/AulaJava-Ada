@@ -19,6 +19,7 @@ O repositório está organizado modularmente por aulas, contendo os desafios pr�
 | **`Aula 2/`** | Banco de Dados, Índices & Concorrência | Otimização de consultas lentas (`EXPLAIN`), mitigação de *page splits* com UUIDv7, uso de Locks Pessimistas sob alta disputa de estoque e estratégias de persistência poliglota. |
 | **`Aula 3/`** | Arquitetura Orientada a Eventos & Consistência | Resolução do problema de *Dual Write* utilizando o padrão **Transactional Outbox**, CDC com Debezium e mensageria assíncrona. |
 | **`Aula 4/`** | Transações Distribuídas & Resiliência | Orquestração de Sagas, compensações automáticas sem rollback físico, CQRS para desacoplamento de leitura/escrita e estratégias de testes de falha (Chaos Engineering). |
+| **`Aula 5/`** | Guia Prático de Engenharia de Release | Conteinerização OCI, otimização de imagens Java com Paketo Buildpacks e Distroless, estratégias de CI/CD, garanta de *Reproducible Builds* e deploys *zero-downtime*. |
 | *Próximas Aulas* | *A definir / Em desenvolvimento* | *Novos desafios de alta escala e resiliência.* |
 
 ---
@@ -30,7 +31,7 @@ O repositório está organizado modularmente por aulas, contendo os desafios pr�
 - **Arquitetura & Padrões:** Sagas (Orquestração), Transactional Outbox, CQRS, Domain-Driven Design (DDD)
 - **Mensageria & Streaming:** Apache Kafka, Debezium (CDC)
 - **Bancos de Dados:** PostgreSQL, Redis
-- **Containerização:** Docker & Docker Compose
+- **Containerização & DevOps:** Docker, Docker Compose, Paketo Buildpacks, Images Distroless (OCI)
 - **Controle de Versão:** Git & GitHub
 
 ---
@@ -39,42 +40,39 @@ O repositório está organizado modularmente por aulas, contendo os desafios pr�
 
 ```text
 .
-├── Aula 2/             # Otimização de bancos, índices, UUIDv7 e Locks
-├── Aula 3/             # Transactional Outbox Pattern e integração com Kafka
-├── Aula 4/             # Transações distribuídas, Sagas e CQRS
+├── Aula 2/              # Otimização de bancos, índices, UUIDv7 e Locks
+├── Aula 3/              # Transactional Outbox Pattern e integração com Kafka
+├── Aula 4/              # Transações distribuídas, Sagas e CQRS
+├── Aula 5/              # Guia Prático de Engenharia de Release e Imagens OCI
 ├── .gitignore          # Arquivos e pastas ignorados pelo Git
-└── README.md           # Documentação do repositório
-
+└── README.md            # Documentação do repositório
 ```
+
+---
 
 ## 🚀 Como Executar os Projetos
 
 1. Clone o repositório:
 
-```Bash
-
-git clone [https://github.com/JTBCode86/AulaJava-Ada.git](https://github.com/JTBCode86/AulaJava-Ada.git)
-
+```bash
+git clone https://github.com/JTBCode86/AulaJava-Ada.git
 ```
 
 2. Acesse a pasta da aula desejada:
 
-```Bash
-
+```bash
 cd AulaJava-Ada/"Aula x"
-
 ```
 
 3. Suba as dependências de infraestrutura (quando aplicável via Docker Compose):
 
-```Bash
-
+```bash
 docker compose up -d
-
 ```
 
 4. Abra na sua IDE de preferência (IntelliJ IDEA) e execute os testes ou a aplicação principal.
-```
 
-👤 Autor
-Desenvolvido por Jean Barbosa (@JTBCode86).
+---
+
+👤 **Autor**  
+Desenvolvido por Jean Barbosa ([@JTBCode86](https://github.com/JTBCode86)).
