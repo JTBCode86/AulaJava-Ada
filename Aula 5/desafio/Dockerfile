@@ -1,13 +1,12 @@
-# Estágio 1: Build (Maven + JDK 21)
-FROM eclipse-temurin:21-jdk-jammy AS builder
+# Estágio 1: Build (Baixa o Maven e compila o projeto dentro do Docker)
+FROM maven:3.9.6-eclipse-temurin-21 AS builder
 WORKDIR /build
 
-COPY mvnw .
-COPY .mvn .mvn
 COPY pom.xml .
 COPY src src
 
-RUN ./mvnw package -DskipTests
+# Compila usando o Maven oficial da imagem
+RUN mvn clean package -DskipTests
 
 # Estágio 2: Runtime Distroless (JRE 21)
 FROM gcr.io/distroless/java21-debian12:nonroot
