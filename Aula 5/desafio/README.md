@@ -33,7 +33,7 @@ desafio/
 │                   ├── V2__expand_add_estado_saga.sql
 │                   └── V3__backfill_estado_saga.sql
 ├── Dockerfile                      # Multi-Stage Build (Eclipse Temurin JDK 21 -> Distroless JRE 21)
-├── docker-compose.yml              # SubIDA e orquestração local (PostgreSQL 16 + API)
+├── docker-compose.yml              # Subida e orquestração local (PostgreSQL 16 + API)
 ├── pom.xml                         # Dependências Spring Boot & Plugin CycloneDX
 └── README.md                       # Documentação do projeto
 ```
@@ -53,22 +53,58 @@ desafio/
 
 ---
 
-## 🔄 Padrão Expand and Contract (Zero-Downtime Migration)
+## 🏗️ Arquitetura de Sistemas & Engenharia de Release
 
-Para realizar a alteração no esquema do banco de dados sem exigir janela de manutenção ou interrupção de serviço, o ciclo de migração é dividido em etapas controladas:
+### 1. Fluxo do Pipeline de CI/CD (GitHub Actions)
 
-1. **Fase 1: Expand (`V2__expand_add_estado_saga.sql`)**
-   - Adiciona a nova coluna `estado_saga` permitindo valores nulos (`NULLABLE`).
-   - Permite que versões antigas da aplicação continuem funcionando sem quebras de contrato no banco.
+```mermaid
+graph TD
+    A[Push / PR em main] --> B[Checkout do Código]
+    B --> C[Setup JDK 21 Temurin com Cache Maven]
+    C --> D[Executar Testes Unitários & Integração]
+    D --> E[Gerar SBOM CycloneDX - BOM.json]
+    E --> F[Build da Imagem Docker Multi-Stage]
+    F --> G[Scan de Vulnerabilidades - Aqua Trivy]
+    G -->|CRITICAL / HIGH detectados| H[Falha na Pipeline / Deployment Bloqueado]
+    G -->|Zero CVEs Críticos| I[Aprovação do Artefato para Promoção]
+```
 
-2. **Fase de Transição (Dual Write em Código):**
-   - A aplicação Java é atualizada para ler da nova coluna e gravar em ambas as colunas (`status_pagamento` e `estado_saga`) sincronizadamente.
+---
 
-3. **Fase 2: Backfill (`V3__backfill_estado_saga.sql`)**
-   - Executa a migração e população assíncrona dos registros legados em segundo plano, sem travar tabelas em produção.
+### 2. Padrão Zero-Downtime Migration (*Expand-Contract*)
 
-4. **Fase 3: Contract (Próximo Release):**
-   - Adiciona restrições `NOT NULL` e remove a coluna legada após validar que 100% do tráfego utiliza a nova estrutura.
+Para garantir atualização contínua sob alto volume de transações por segundo (TPS), o banco de dados PostgreSQL evolui sem travar tabelas nem quebrar requisições ativas:
+
+```text
++-----------------------------------------------------------------------------------+
+| FASE 1: EXPAND (V2)                                                               |
+| • Flyway adiciona coluna 'estado_saga' como NULLABLE.                            |
+| • Aplicação v1 continua rodando e escrevendo em 'status_pagamento'.               |
++-----------------------------------------------------------------------------------+
+                                          │
+                                          ▼
++-----------------------------------------------------------------------------------+
+| FASE 2: DUAL-WRITE & BACKFILL (V3)                                               |
+| • Script de Backfill sincroniza registros legados no banco.                      |
+| • Aplicação v2 entra em execução realizando Dual-Write nas duas colunas.         |
+| • Rollback seguro mantido (versão v1 lê 'status_pagamento' se necessário).         |
++-----------------------------------------------------------------------------------+
+                                          │
+                                          ▼
++-----------------------------------------------------------------------------------+
+| FASE 3: CONTRACT (Futuro V4)                                                     |
+| • 100% das instâncias migradas para v2.                                           |
+| • Coluna 'status_pagamento' descontinuada e removida via migração assíncrona.    |
++-----------------------------------------------------------------------------------+
+```
+
+---
+
+### 3. Hardening de Containers & Observabilidade
+
+- **Multi-Stage Build:** Separação do ambiente de compilação da imagem de execução final.
+- **Imagem Distroless:** Imagem enxuta sem gerenciadores de pacote (`apt`) ou shell (`/bin/sh`), reduzindo a superfície de ataque.
+- **Execução não-root:** Execução restrita ao usuário `nonroot`.
 
 ---
 
@@ -76,7 +112,6 @@ Para realizar a alteração no esquema do banco de dados sem exigir janela de ma
 
 ### Pré-requisitos
 - Docker Engine e Docker Compose instalados.
-- Java 21 e Maven 3.9+ (caso queira executar fora do container).
 
 ### 1. Inicializar Infraestrutura e Aplicação
 Dentro da pasta `desafio/`, execute:
@@ -85,14 +120,7 @@ Dentro da pasta `desafio/`, execute:
 docker compose up --build -d
 ```
 
-O Docker Compose inicializará o banco PostgreSQL, executará o healthcheck e construirá a imagem da aplicação Checkout via Multi-Stage Build.
-
-### 2. Verificar os Containers em Execução
-```bash
-docker compose ps
-```
-
-### 3. Validar Healthcheck (Smoke Test)
+### 2. Validar Healthcheck (Smoke Test)
 ```bash
 curl -i http://localhost:8080/api/pagamentos/healthz
 ```
@@ -102,7 +130,7 @@ curl -i http://localhost:8080/api/pagamentos/healthz
 {"service":"checkout-service","status":"UP"}
 ```
 
-### 4. Testar a Criação e Listagem de Pagamentos
+### 3. Testar a Criação e Listagem de Pagamentos
 - **Criar Pagamento:**
   ```bash
   curl -X POST "http://localhost:8080/api/pagamentos?valor=250.50"
@@ -115,11 +143,10 @@ curl -i http://localhost:8080/api/pagamentos/healthz
 
 ---
 
-## 🛡️ Pipeline de CI/CD (GitHub Actions)
+## 📊 Métricas de Operação (SLO / SLI)
 
-A esteira declarativa definida em `.github/workflows/ci.yml` garante a qualidade e segurança do artefato a cada *Push* ou *Pull Request*:
-
-1. **Build e Testes Unitários:** Executa a compilação e validação do código via `./mvnw test`.
-2. **Software Bill of Materials (SBOM):** Gera o inventário de componentes em formato CycloneDX (`target/bom.json`).
-3. **Container Build:** Constrói a imagem Docker baseada em Google Distroless.
-4. **Vulnerability Scan (Trivy):** Analisa a imagem OCI e quebra o build (`exit-code 1`) se houver vulnerabilidades críticas não corrigidas.
+| Métrica | Objetivo de Nível de Serviço (SLO) | Indicador (SLI) |
+| :--- | :--- | :--- |
+| **Disponibilidade durante Deploy** | 99.99% Uptime | Endpoint `/healthz` via Actuator |
+| **Tempo de Deployment** | < 3 minutos na pipeline | Duração do job no GitHub Actions |
+| **Vulnerabilidades de Imagem** | 0 Vulnerabilidades `CRITICAL` / `HIGH` | Relatório do Trivy Scanner |
