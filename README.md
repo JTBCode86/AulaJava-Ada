@@ -20,6 +20,7 @@ O repositório está organizado modularmente por aulas, contendo os desafios pr�
 | **`Aula 3/`** | Arquitetura Orientada a Eventos & Consistência | Resolução do problema de *Dual Write* utilizando o padrão **Transactional Outbox**, CDC com Debezium e mensageria assíncrona. |
 | **`Aula 4/`** | Transações Distribuídas & Resiliência | Orquestração de Sagas, compensações automáticas sem rollback físico, CQRS para desacoplamento de leitura/escrita e estratégias de testes de falha (Chaos Engineering). |
 | **`Aula 5/`** | Guia Prático de Engenharia de Release | Conteinerização OCI, otimização de imagens Java com Paketo Buildpacks e Distroless, estratégias de CI/CD, garanta de *Reproducible Builds* e deploys *zero-downtime*. |
+| **`Aula 6/`** | Observabilidade & Diagnóstico em Produção | Diagnóstico de gargalos distribuídos sem acesso a shell em imagens *Distroless*, correlação de logs com W3C `traceparent`, amostragem de traces (*Head* vs *Tail Sampling*), métricas RED/USE, prevenção de explosão de cardinalidade e conformidade com a LGPD. |
 | *Próximas Aulas* | *A definir / Em desenvolvimento* | *Novos desafios de alta escala e resiliência.* |
 
 ---
@@ -44,7 +45,8 @@ O repositório está organizado modularmente por aulas, contendo os desafios pr�
 ├── Aula 3/              # Transactional Outbox Pattern e integração com Kafka
 ├── Aula 4/              # Transações distribuídas, Sagas e CQRS
 ├── Aula 5/              # Guia Prático de Engenharia de Release e Imagens OCI
-├── .gitignore          # Arquivos e pastas ignorados pelo Git
+├── Aula 6/				 # Observabilidade, Diagnóstico em Produção e Telemetria Distribuída	
+├── .gitignore           # Arquivos e pastas ignorados pelo Git
 └── README.md            # Documentação do repositório
 ```
 
