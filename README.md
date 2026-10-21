@@ -45,7 +45,7 @@ O repositório está organizado modularmente por aulas, contendo os desafios pr�
 ├── Aula 3/              # Transactional Outbox Pattern e integração com Kafka
 ├── Aula 4/              # Transações distribuídas, Sagas e CQRS
 ├── Aula 5/              # Guia Prático de Engenharia de Release e Imagens OCI
-├── Aula 6/	   	# Observabilidade, Diagnóstico em Produção e Telemetria Distribuída	
+├── Aula 6/	   	 # Observabilidade, Diagnóstico em Produção e Telemetria Distribuída	
 ├── .gitignore           # Arquivos e pastas ignorados pelo Git
 └── README.md            # Documentação do repositório
 ```
