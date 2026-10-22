@@ -1,0 +1,23 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: checkout-service
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, prometheus, metrics
+  metrics:
+    tags:
+      application: ${spring.application.name}
+      environment: production
+
+otel:
+  service:
+    name: ${spring.application.name}
+  exporter:
+    otlp:
+      endpoint: http://otel-collector:4317
