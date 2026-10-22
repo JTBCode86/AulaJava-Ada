@@ -1,152 +1,133 @@
-# 🚀 Serviço de Checkout: Engenharia de Release, Containers & Zero-Downtime
+# 🚀 Desafio de Observabilidade & Teste de Carga - Checkout Service
 
-Este projeto é uma implementação de referência de um serviço de **Checkout** resiliente e seguro, projetado com foco em arquitetura de microsserviços, **Engenharia de Release**, empacotamento OCI seguro, auditoria de vulnerabilidades em esteiras CI/CD e evolução de banco de dados sem downtime (*Zero-Downtime Deploy*) através do padrão **Expand and Contract**.
+Este projeto consiste numa demonstração prática de observabilidade e engenharia de resiliência aplicada a um microsserviço de **Checkout** desenvolvido em **Spring Boot 3.2.5**.
 
----
+O objetivo principal do desafio foi integrar telemetria distribuída (**OpenTelemetry**), monitorização de métricas (**Prometheus**) e rastreamento de chamadas (**Jaeger**), validando a resiliência da aplicação sob picos extremos de tráfego simulados via **k6**.
 
-## 📂 Estrutura do Repositório (`desafio/`)
+## 🏗️ Arquitetura da Solução
 
-```text
-desafio/
-├── .github/
-│   └── workflows/
-│       └── ci.yml                 # Pipeline GitHub Actions (Build, Testes, SBOM e Trivy)
-├── src/
-│   └── main/
-│       ├── java/
-│       │   └── com/
-│       │       └── adatest/
-│       │           └── checkout/
-│       │               ├── CheckoutApplication.java
-│       │               ├── controller/
-│       │               │   └── PagamentoController.java
-│       │               ├── domain/
-│       │               │   ├── Pagamento.java
-│       │               │   └── StatusPagamento.java
-│       │               └── repository/
-│       │                   └── PagamentoRepository.java
-│       └── resources/
-│           ├── application.yml
-│           └── db/
-│               └── migration/
-│                   ├── V1__init_schema.sql
-│                   ├── V2__expand_add_estado_saga.sql
-│                   └── V3__backfill_estado_saga.sql
-├── Dockerfile                      # Multi-Stage Build (Eclipse Temurin JDK 21 -> Distroless JRE 21)
-├── docker-compose.yml              # Subida e orquestração local (PostgreSQL 16 + API)
-├── pom.xml                         # Dependências Spring Boot & Plugin CycloneDX
-└── README.md                       # Documentação do projeto
+A arquitetura foi orquestrada em ambiente Docker, permitindo a comunicação entre a aplicação, os coletores de telemetria e o gerador de tráfego.
+
+```
+                  +-------------------+
+                  |  k6 Load Tester   |
+                  |  (Docker/k6)      |
+                  +---------+---------+
+                            |
+                            | (HTTP POST /api/checkout)
+                            v
++-----------------------------------------------------------------+
+| Docker Network / Host Bridge (host.docker.internal)             |
+|                                                                 |
+|   +-----------------------+                                     |
+|   |   Checkout Service    |<----------- (Scrape /actuator)      |
+|   |  (Spring Boot 3.2.5)  |                   |                 |
+|   +-----------+-----------+                   |                 |
+|               |                               |                 |
+|               | (OTLP Traces)                 v                 |
+|               v                     +-------------------+       |
+|     +-------------------+           |    Prometheus     |       |
+|     |   Jaeger Tracing  |           |     (Metrics)     |       |
+|     +-------------------+           +-------------------+       |
++-----------------------------------------------------------------+
+
 ```
 
----
+### Componentes:
 
-## 🛠️ Tecnologias e Decisões de Arquitetura
+* **Checkout Service:** Aplicação Spring Boot 3.2.5 compilada via Docker Multi-stage build com suporte a micrométricas Actuator e OpenTelemetry Java Agent.
+* **Prometheus:** Servidor de monitorização responsável por realizar o *scrape* contínuo do endpoint `/actuator/prometheus`.
+* **Jaeger:** Plataforma de rastreamento distribuído que recebe *spans* e *traces* OTLP exportados pelo Java Agent do OpenTelemetry.
+* **k6:** Ferramenta de teste de carga para simulação de cenários de *spike testing* (picos súbitos de acessos).
 
-- **Linguagem & Framework:** Java 21 LTS com Spring Boot 3.2.x e Spring Data JPA.
-- **Banco de Dados:** PostgreSQL 16.
-- **Gerenciamento de Migrações:** Flyway com versionamento sequencial imutável.
-- **Empacotamento OCI Seguro:** Multi-stage build utilizando **Google Distroless (`gcr.io/distroless/java21-debian12:nonroot`)** como imagem final. Não contém shell, pacotes desnecessários ou usuário `root`, mitigando execuções arbitrárias de código.
-- **Segurança & Governança (DevSecOps):** 
-  - **CycloneDX Maven Plugin**: Geração automática de SBOM (*Software Bill of Materials*).
-  - **Aqua Trivy Scanner**: Análise estática no pipeline buscando vulnerabilidades de severidade `CRITICAL` e `HIGH` na imagem container.
-- **Zero-Downtime Database Migration:** Aplicação do padrão *Expand and Contract* com suporte a *Dual Write* no modelo domain.
+## 📁 Estrutura do Projeto
 
----
-
-## 🏗️ Arquitetura de Sistemas & Engenharia de Release
-
-### 1. Fluxo do Pipeline de CI/CD (GitHub Actions)
-
-```mermaid
-graph TD
-    A[Push / PR em main] --> B[Checkout do Código]
-    B --> C[Setup JDK 21 Temurin com Cache Maven]
-    C --> D[Executar Testes Unitários & Integração]
-    D --> E[Gerar SBOM CycloneDX - BOM.json]
-    E --> F[Build da Imagem Docker Multi-Stage]
-    F --> G[Scan de Vulnerabilidades - Aqua Trivy]
-    G -->|CRITICAL / HIGH detectados| H[Falha na Pipeline / Deployment Bloqueado]
-    G -->|Zero CVEs Críticos| I[Aprovação do Artefato para Promoção]
+```
+lab/
+├── src/                    # Código fonte Java (Spring Boot)
+│   └── main/java/com/
+│       └── example/demo/
+│           ├── CheckoutApplication.java
+│           └── CheckoutController.java
+├── Dockerfile              # Build multi-stage da aplicação
+├── docker-compose.yml      # Orquestração dos containers (App, Prometheus, Jaeger)
+├── prometheus.yml          # Configuração de scrape do Prometheus
+├── k6-spike-test.js        # Script de teste de carga (Spike Testing)
+└── pom.xml                 # Dependências Maven
 ```
 
----
+## 🛠️ Tecnologias Utilizadas
 
-### 2. Padrão Zero-Downtime Migration (*Expand-Contract*)
+* **Linguagem & Framework:** Java 17, Spring Boot 3.2.5, Spring Web, Spring Boot Actuator
+* **Observabilidade:** Micrometer Prometheus, OpenTelemetry Java Agent (v2.2.0), Jaeger All-in-One
+* **Infraestrutura & Containerização:** Docker, Docker Compose, Docker Multi-Stage Builds
+* **Testes de Carga:** Grafana k6
+* **Ambiente de Execução:** Windows Command Prompt (CMD)
 
-Para garantir atualização contínua sob alto volume de transações por segundo (TPS), o banco de dados PostgreSQL evolui sem travar tabelas nem quebrar requisições ativas:
-
-```text
-+-----------------------------------------------------------------------------------+
-| FASE 1: EXPAND (V2)                                                               |
-| • Flyway adiciona coluna 'estado_saga' como NULLABLE.                            |
-| • Aplicação v1 continua rodando e escrevendo em 'status_pagamento'.               |
-+-----------------------------------------------------------------------------------+
-                                          │
-                                          ▼
-+-----------------------------------------------------------------------------------+
-| FASE 2: DUAL-WRITE & BACKFILL (V3)                                               |
-| • Script de Backfill sincroniza registros legados no banco.                      |
-| • Aplicação v2 entra em execução realizando Dual-Write nas duas colunas.         |
-| • Rollback seguro mantido (versão v1 lê 'status_pagamento' se necessário).         |
-+-----------------------------------------------------------------------------------+
-                                          │
-                                          ▼
-+-----------------------------------------------------------------------------------+
-| FASE 3: CONTRACT (Futuro V4)                                                     |
-| • 100% das instâncias migradas para v2.                                           |
-| • Coluna 'status_pagamento' descontinuada e removida via migração assíncrona.    |
-+-----------------------------------------------------------------------------------+
-```
-
----
-
-### 3. Hardening de Containers & Observabilidade
-
-- **Multi-Stage Build:** Separação do ambiente de compilação da imagem de execução final.
-- **Imagem Distroless:** Imagem enxuta sem gerenciadores de pacote (`apt`) ou shell (`/bin/sh`), reduzindo a superfície de ataque.
-- **Execução não-root:** Execução restrita ao usuário `nonroot`.
-
----
-
-## 🚀 Como Executar o Projeto Localmente
+## 🚀 Passo a Passo para Execução
 
 ### Pré-requisitos
-- Docker Engine e Docker Compose instalados.
 
-### 1. Inicializar Infraestrutura e Aplicação
-Dentro da pasta `desafio/`, execute:
+* **Docker Desktop** instalado e ativo.
+* **Git** instalado (opcional).
 
-```bash
-docker compose up --build -d
+### 1. Clonar o Repositório e Navegar até à Pasta do Projeto
+
+Abre o **Prompt de Comando (CMD)** e navega até à pasta do laboratório:
+
+```cmd
+cd /d "E:\AulaJava-Ada\Aula 6\desafio\lab"
 ```
 
-### 2. Validar Healthcheck (Smoke Test)
-```bash
-curl -i http://localhost:8080/api/pagamentos/healthz
+### 2. Construir e Subir a Infraestrutura (Docker Compose)
+
+Executa a compilação da imagem Docker da aplicação e sobe todos os serviços em segundo plano:
+
+```cmd
+docker compose build --no-cache
+docker compose up -d
 ```
 
-**Resposta esperada:**
+> **Serviços Ativos:**
+> * **Checkout Service:** `http://localhost:8080`
+> * **Prometheus:** `http://localhost:9090`
+> * **Jaeger UI:** `http://localhost:16686`
+
+### 3. Validar a Aplicação com um Teste de Requisição Única
+
+Certifica-te de que o endpoint de checkout está ativo executando o seguinte `curl` no CMD:
+
+```cmd
+curl -X POST http://localhost:8080/api/checkout ^
+  -H "Content-Type: application/json" ^
+  -d "{\"cart_id\": \"cart-999\", \"payment_method\": \"credit_card\"}"
+```
+
+**Resposta Esperada:**
+
 ```json
-{"service":"checkout-service","status":"UP"}
+{"message":"Checkout realizado com sucesso","status":"SUCCESS","order_id":"..."}
 ```
 
-### 3. Testar a Criação e Listagem de Pagamentos
-- **Criar Pagamento:**
-  ```bash
-  curl -X POST "http://localhost:8080/api/pagamentos?valor=250.50"
-  ```
+### 4. Executar o Teste de Carga (Spike Test com k6)
 
-- **Listar Pagamentos:**
-  ```bash
-  curl http://localhost:8080/api/pagamentos
-  ```
+Executa o container do k6 montando o diretório local e mapeando a rede host para permitir comunicação cruzada entre containers:
 
----
+```cmd
+docker run --rm -i --add-host=host.docker.internal:host-gateway -v "%cd%:/app" -w /app grafana/k6 run k6-spike-test.js
+```
 
-## 📊 Métricas de Operação (SLO / SLI)
+O teste simulará uma rampa de utilizadores virtuais (VUs) subindo até **1.000 VUs simultâneas** num cenário de pico.
 
-| Métrica | Objetivo de Nível de Serviço (SLO) | Indicador (SLI) |
-| :--- | :--- | :--- |
-| **Disponibilidade durante Deploy** | 99.99% Uptime | Endpoint `/healthz` via Actuator |
-| **Tempo de Deployment** | < 3 minutos na pipeline | Duração do job no GitHub Actions |
-| **Vulnerabilidades de Imagem** | 0 Vulnerabilidades `CRITICAL` / `HIGH` | Relatório do Trivy Scanner |
+## 📊 Resultados Obtidos
+
+1. **Testes de Resiliência e Carga:**
+   * A aplicação Spring Boot suportou o pico simulado pelo k6 sem quedas de serviço, registando processamento massivo no endpoint `/api/checkout`.
+
+2. **Métricas de Performance (Prometheus):**
+   * Coleta com sucesso da métrica `http_server_requests_seconds_count` agrupada por métodos HTTP (`POST` e `GET`), status (`200 OK`) e cenários de ambiente (`production`).
+   * Rastreio contínuo do estado da JVM e tempo de resposta das requisições via Spring Actuator.
+
+3. **Rastreamento Distribuído (Jaeger):**
+   * Captura automática de *spans* sem necessidade de alteração no código de negócio graças ao suporte do OpenTelemetry Java Agent.
+   * Rastreio e visibilidade das rotas `/api/checkout` e chamadas internas do ecossistema.
