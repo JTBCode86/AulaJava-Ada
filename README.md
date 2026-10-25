@@ -21,7 +21,7 @@ O repositório está organizado modularmente por aulas, contendo os desafios pr�
 | **`Aula 4/`** | Transações Distribuídas & Resiliência | Orquestração de Sagas, compensações automáticas sem rollback físico, CQRS para desacoplamento de leitura/escrita e estratégias de testes de falha (Chaos Engineering). |
 | **`Aula 5/`** | Guia Prático de Engenharia de Release | Conteinerização OCI, otimização de imagens Java com Paketo Buildpacks e Distroless, estratégias de CI/CD, garanta de *Reproducible Builds* e deploys *zero-downtime*. |
 | **`Aula 6/`** | Observabilidade & Diagnóstico em Produção | Diagnóstico de gargalos distribuídos sem acesso a shell em imagens *Distroless*, correlação de logs com W3C `traceparent`, amostragem de traces (*Head* vs *Tail Sampling*), métricas RED/USE, prevenção de explosão de cardinalidade e conformidade com a LGPD. |
-| **`ProjetoFinal/`** | **MeliCore Checkout Engine (Projeto Integrador)** | Arquitetura de microsserviços de alto desempenho, resiliente e orientada a eventos. Implementação do **Padrão SAGA** via **Temporal.io**, **Transactional Outbox Pattern** com PostgreSQL e mensageria confiável via **Apache Kafka** com suporte a Dead Letter Queue (**DLQ**). |
+| **`ProjetoBonus/`** | **MeliCore Checkout Engine (Projeto Integrador)** | Arquitetura de microsserviços de alto desempenho, resiliente e orientada a eventos. Implementação do **Padrão SAGA** via **Temporal.io**, **Transactional Outbox Pattern** com PostgreSQL e mensageria confiável via **Apache Kafka** com suporte a Dead Letter Queue (**DLQ**). |
 | *Próximas Aulas* | *A definir / Em desenvolvimento* | *Novos desafios de alta escala e resiliência.* |
 
 ---
@@ -47,7 +47,7 @@ O repositório está organizado modularmente por aulas, contendo os desafios pr�
 ├── Aula 4/              # Transações distribuídas, Sagas e CQRS
 ├── Aula 5/              # Guia Prático de Engenharia de Release e Imagens OCI
 ├── Aula 6/	   	 # Observabilidade, Diagnóstico em Produção e Telemetria Distribuída	
-├── ProjetoFinal/        # MeliCore Checkout Engine (Spring Boot + Temporal + Postgres + Kafka)
+├── ProjetoBonus/        # MeliCore Checkout Engine (Spring Boot + Temporal + Postgres + Kafka)
 ├── .gitignore           # Arquivos e pastas ignorados pelo Git
 └── README.md            # Documentação do repositório
 ```
