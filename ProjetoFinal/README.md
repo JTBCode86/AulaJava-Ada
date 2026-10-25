@@ -10,6 +10,7 @@ Um sistema de checkout de microsserviços de alto desempenho, resiliente e orien
 - [Arquitetura](#-arquitetura)
 - [Estrutura de Pastas](#-estrutura-de-pastas)
 - [Guia de Execução Passo a Passo](#-guia-de-execução-passo-a-passo)
+- [Execução dos Testes Integrados e Unitários](#-execução-dos-testes-integrados-e-unitários)
 - [Visualização de Ordens Processadas (Portal Temporal)](#-visualização-de-ordens-processadas-portal-temporal)
 - [Trade-offs de Arquitetura](#-trade-offs-de-arquitetura)
 - [Resolução de Problemas (Troubleshooting)](#-resolução-de-problemas-troubleshooting)
@@ -31,10 +32,11 @@ Ele resolve o problema de escrita dupla (*dual-write problem*) entre fronteiras 
 
 * **Linguagem / Framework**: Java 17, Spring Boot 3.x, Spring Data JPA, Spring Kafka
 * **Orquestração de Workflows**: Temporal.io (Java SDK)
-* **Banco de Dados & Migração**: PostgreSQL 15, Flyway
-* **Mensageria & Streaming**: Apache Kafka, Zookeeper
+* **Banco de Dados & Migração**: PostgreSQL 15, Flyway, H2 Database (em memória para testes)
+* **Mensageria & Streaming**: Apache Kafka, Embedded Kafka (para testes), Zookeeper
 * **Containerização**: Docker, Docker Compose
 * **Observabilidade & Resiliência**: Resilience4j, OpenTelemetry (OTLP)
+* **Testes**: JUnit 5, Embedded Kafka, Spring Boot Test
 
 ---
 
@@ -99,7 +101,9 @@ meli-core-engine/
     │   │           └── engine/
     │   │               ├── CheckoutEngineApplication.java
     │   │               ├── config/
+    │   │               │   ├── KafkaConfig.java
     │   │               │   ├── KafkaTopicConfig.java
+    │   │               │   ├── OpenTelemetryConfig.java
     │   │               │   └── TemporalConfig.java
     │   │               ├── controller/
     │   │               │   └── CheckoutController.java
@@ -122,6 +126,14 @@ meli-core-engine/
     │           └── migration/
     │               └── V1__create_outbox_and_orders_tables.sql
     └── test/
+        ├── java/
+        │   └── com/
+        │       └── melicore/
+        │           └── engine/
+        │               ├── CheckoutEngineApplicationTests.java
+        │               └── OutboxPollerTest.java
+        └── resources/
+            └── application-test.properties
 ```
 
 ---
@@ -177,6 +189,48 @@ SUCCESS - Pedido processado e etiqueta gerada: MELI-LABEL-2992C450
 
 ---
 
+## 🧪 Execução dos Testes Integrados e Unitários
+
+O projeto conta com uma suíte de testes de integração automatizada que valida o carregamento do contexto da aplicação, persitência de dados e a publicação de mensagens via **Transactional Outbox**.
+
+### Isolamento do Ambiente de Testes
+Para garantir a execução ágil dos testes sem depender de infraestruturas externas ativas (Docker):
+* **Perfil `@ActiveProfiles("test")`**: Utiliza as configurações isoladas presentes em `src/test/resources/application-test.properties`.
+* **Banco de Dados em Memória (H2)**: Substitui o PostgreSQL real durante os testes, aplicando DDL automático.
+* **Kafka Embarcado (`@EmbeddedKafka`)**: Inicia um broker de Kafka em memória dinamicamente para validar o envio e consumo de tópicos.
+* **Temporal Silenciado**: O registo de workers do Temporal é condicionado via `@ConditionalOnProperty(name = "temporal.worker.enabled", havingValue = "true")`, evitando tentativas de conexão à porta 7233 em testes locais.
+* **OpenTelemetry Resiliente**: Possui tratamento contra registos globais duplicados durante o ciclo de testes na mesma JVM.
+
+### Como Executar os Testes
+
+#### Via Linha de Comando (Maven Wrapper / Maven)
+Execute o comando abaixo na raiz do projeto:
+
+```bash
+./mvnw test
+```
+*Se preferir usar o Maven instalado localmente:*
+```bash
+mvn test
+```
+
+#### Via IDE (IntelliJ IDEA)
+1. Navegue até ao diretório **`src/test/java`**.
+2. Clique com o botão direito em cima do pacote **`com.melicore.engine`** (ou da pasta `java`).
+3. Selecione a opção **Run 'All Tests'** (ou pressione `Ctrl + Shift + F10` / `Cmd + Shift + R`).
+
+### Cenários de Teste Cobertos
+1. **`CheckoutEngineApplicationTests`**:
+   * Valida a inicialização completa do contexto do Spring Boot.
+   * Confirma a correta instanciação e injeção de Beans (JPA Data, Spring Kafka, OpenTelemetry e componentes da aplicação).
+2. **`OutboxPollerTest`**:
+   * Simula a gravação de eventos pendentes (`processed = false`) na tabela `outbox_events`.
+   * Executa a rotina agendada do `OutboxPoller`.
+   * Verifica a publicação das mensagens no tópico do Kafka embarcado (`orders.events`).
+   * Assegura que o estado do evento é devidamente atualizado para processado (`processed = true`).
+
+---
+
 ## 🖥 Visualização de Ordens Processadas (Portal Temporal)
 
 Todas as ordens e workflows SAGA processados podem ser inspecionados em tempo real através do portal Web do **Temporal.io**:
@@ -223,6 +277,8 @@ Todas as ordens e workflows SAGA processados podem ser inspecionados em tempo re
   ```bash
   docker-compose restart checkout-engine
   ```
-  
-  👤 **Autor**  
+
+---
+
+👤 **Autor**  
 Desenvolvido por Jean Barbosa ([@JTBCode86](https://github.com/JTBCode86)).
