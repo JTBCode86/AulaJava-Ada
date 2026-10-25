@@ -40,11 +40,24 @@ public class OpenTelemetryConfig {
                 .build();
 
         // Inicialização do SDK do OpenTelemetry
-        OpenTelemetrySdk openTelemetrySdk = OpenTelemetrySdk.builder()
-                .setTracerProvider(tracerProvider)
-                .buildAndRegisterGlobal();
+        OpenTelemetrySdk openTelemetrySdk;
+        try {
+            openTelemetrySdk = OpenTelemetrySdk.builder()
+                    .setTracerProvider(tracerProvider)
+                    .buildAndRegisterGlobal();
+        } catch (IllegalStateException e) {
+            openTelemetrySdk = OpenTelemetrySdk.builder()
+                    .setTracerProvider(tracerProvider)
+                    .build();
+        }
 
         return openTelemetrySdk;
+
+        //OpenTelemetrySdk openTelemetrySdk = OpenTelemetrySdk.builder()
+        //        .setTracerProvider(tracerProvider)
+        //       .buildAndRegisterGlobal();
+
+        //return openTelemetrySdk;
     }
 
     @Bean

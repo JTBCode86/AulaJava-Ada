@@ -12,6 +12,7 @@ import jakarta.annotation.PreDestroy;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 @Configuration
 public class TemporalConfig {
@@ -36,6 +37,7 @@ public class TemporalConfig {
     }
 
     @Bean
+    @ConditionalOnProperty(name = "temporal.worker.enabled", havingValue = "true", matchIfMissing = true)
     public WorkerFactory workerFactory(WorkflowClient workflowClient, OrderActivitiesImpl orderActivities) {
         factory = WorkerFactory.newInstance(workflowClient);
         Worker worker = factory.newWorker("CHECKOUT_TASK_QUEUE");
