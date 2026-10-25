@@ -223,3 +223,6 @@ Todas as ordens e workflows SAGA processados podem ser inspecionados em tempo re
   ```bash
   docker-compose restart checkout-engine
   ```
+  
+  👤 **Autor**  
+Desenvolvido por Jean Barbosa ([@JTBCode86](https://github.com/JTBCode86)).
