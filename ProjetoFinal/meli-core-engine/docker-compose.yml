@@ -1,0 +1,100 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: melicore-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: melicore
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - melicore-net
+  
+  # Temporal Server (Orquestração SAGA)
+  temporal:
+    image: temporalio/auto-setup:1.22.4
+    container_name: melicore-temporal
+    ports:
+      - "7233:7233"
+    environment:
+      - DB=postgres
+      - DB_PORT=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PWD=password
+      - POSTGRES_SEEDS=postgres
+    depends_on:
+      - postgres
+    networks:
+      - melicore-net
+
+  # Temporal Web UI (Interface de Monitorização)
+  temporal-ui:
+    image: temporalio/ui:latest
+    container_name: melicore-temporal-ui
+    ports:
+      - "8233:8080"
+    environment:
+      - TEMPORAL_ADDRESS=temporal:7233
+    depends_on:
+      - temporal
+    networks:
+      - melicore-net
+      
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: melicore-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - melicore-net
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: melicore-kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "29092:29092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - melicore-net
+
+  # Nossa Aplicação Checkout Engine (Spring Boot)
+  checkout-engine:
+    build: .
+    container_name: melicore-checkout-engine
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/melicore
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=password
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:29092
+      - TEMPORAL_TARGET=temporal:7233
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317
+      - JAVA_TOOL_OPTIONS=-Dspring.kafka.bootstrap-servers=kafka:29092 -Dtemporal.target=temporal:7233   
+    depends_on:
+      - postgres
+      - kafka
+      - temporal
+    networks:
+      - melicore-net
+
+volumes:
+  postgres_data:
+
+networks:
+  melicore-net:
+    driver: bridge
