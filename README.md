@@ -26,11 +26,11 @@ Abaixo estão listados os templates de System Design e entregáveis de engenhari
 
 | Aula | Tema | Arquivo de Entregável / Template |
 | :---: | :--- | :--- |
-| **02** | APIs Resilientes | [`PE-JV-003-Aula-02-Template-System-Design.md`](./Aula%202/PE-JV-003-Aula-02-Template-System-Design.md) |
-| **03** | Banco de Dados em Larga Escala | [`PE-JV-003-Aula-03-Template-System-Design.md`](./Aula%203/PE-JV-003-Aula-03-Template-System-Design.md) |
-| **04** | Microsserviços & Padrão Saga | [`PE-JV-003-Aula-04-Template-System-Design.md`](./Aula%204/PE-JV-003-Aula-04-Template-System-Design.md) |
-| **05** | Containers, CI/CD & Deploy sem Downtime | [`PE-JV-003-Aula-05-Template-System-Design.md`](./Aula%205/PE-JV-003-Aula-05-Template-System-Design.md) |
-| **06** | Observabilidade & Diagnóstico em Produção | [`PE-JV-003-Aula-06-Template-System-Design.md`](./Aula%206/PE-JV-003-Aula-06-Template-System-Design.md) |
+| **02** | APIs Resilientes | [`PE-JV-003-Aula-02-Template-System-Design.md`](./Aula02/PE-JV-003-Aula-02-Template-System-Design.md) |
+| **03** | Banco de Dados em Larga Escala | [`PE-JV-003-Aula-03-Template-System-Design.md`](./Aula03/PE-JV-003-Aula-03-Template-System-Design.md) |
+| **04** | Microsserviços & Padrão Saga | [`PE-JV-003-Aula-04-Template-System-Design.md`](./Aula04/PE-JV-003-Aula-04-Template-System-Design.md) |
+| **05** | Containers, CI/CD & Deploy sem Downtime | [`PE-JV-003-Aula-05-Template-System-Design.md`](./Aula05/PE-JV-003-Aula-05-Template-System-Design.md) |
+| **06** | Observabilidade & Diagnóstico em Produção | [`PE-JV-003-Aula-06-Template-System-Design.md`](./Aula06/PE-JV-003-Aula-06-Template-System-Design.md) |
 
 ---
 
@@ -40,11 +40,11 @@ O repositório está organizado modularmente por aulas, contendo os desafios pr�
 
 | Pasta / Aula | Tema Principal & Contexto de Negócio | Desafio Técnico / Arquitetural |
 | :--- | :--- | :--- |
-| **`Aula 2/`** | Banco de Dados, Índices & Concorrência | Otimização de consultas lentas (`EXPLAIN`), mitigação de *page splits* com UUIDv7, uso de Locks Pessimistas sob alta disputa de estoque e estratégias de persistência poliglota. |
-| **`Aula 3/`** | Arquitetura Orientada a Eventos & Consistência | Resolução do problema de *Dual Write* utilizando o padrão **Transactional Outbox**, CDC com Debezium e mensageria assíncrona. |
-| **`Aula 4/`** | Transações Distribuídas & Resiliência | Orquestração de Sagas, compensações automáticas sem rollback físico, CQRS para desacoplamento de leitura/escrita e estratégias de testes de falha (Chaos Engineering). |
-| **`Aula 5/`** | Guia Prático de Engenharia de Release | Conteinerização OCI, otimização de imagens Java com Paketo Buildpacks e Distroless, estratégias de CI/CD, garantia de *Reproducible Builds* e deploys *zero-downtime*. |
-| **`Aula 6/`** | Observabilidade & Diagnóstico em Produção | Diagnóstico de gargalos distribuídos sem acesso a shell em imagens *Distroless*, correlação de logs com W3C `traceparent`, amostragem de traces (*Head* vs *Tail Sampling*), métricas RED/USE, prevenção de explosão de cardinalidade e conformidade com a LGPD. |
+| **`Aula02/`** | Banco de Dados, Índices & Concorrência | Otimização de consultas lentas (`EXPLAIN`), mitigação de *page splits* com UUIDv7, uso de Locks Pessimistas sob alta disputa de estoque e estratégias de persistência poliglota. |
+| **`Aula03/`** | Arquitetura Orientada a Eventos & Consistência | Resolução do problema de *Dual Write* utilizando o padrão **Transactional Outbox**, CDC com Debezium e mensageria assíncrona. |
+| **`Aula04/`** | Transações Distribuídas & Resiliência | Orquestração de Sagas, compensações automáticas sem rollback físico, CQRS para desacoplamento de leitura/escrita e estratégias de testes de falha (Chaos Engineering). |
+| **`Aula05/`** | Guia Prático de Engenharia de Release | Conteinerização OCI, otimização de imagens Java com Paketo Buildpacks e Distroless, estratégias de CI/CD, garantia de *Reproducible Builds* e deploys *zero-downtime*. |
+| **`Aula06/`** | Observabilidade & Diagnóstico em Produção | Diagnóstico de gargalos distribuídos sem acesso a shell em imagens *Distroless*, correlação de logs com W3C `traceparent`, amostragem de traces (*Head* vs *Tail Sampling*), métricas RED/USE, prevenção de explosão de cardinalidade e conformidade com a LGPD. |
 | **`ProjetoBonus/`** | **MeliCore Checkout Engine (Projeto Integrador)** | Arquitetura de microsserviços de alto desempenho, resiliente e orientada a eventos. Implementação do **Padrão SAGA** via **Temporal.io**, **Transactional Outbox Pattern** com PostgreSQL e mensageria confiável via **Apache Kafka** com suporte a Dead Letter Queue (**DLQ**). |
 
 ---
@@ -65,11 +65,11 @@ O repositório está organizado modularmente por aulas, contendo os desafios pr�
 
 ```text
 .
-├── Aula 2/              # Otimização de bancos, índices, UUIDv7, Locks e Template System Design 02
-├── Aula 3/              # Transactional Outbox Pattern, Kafka e Template System Design 03
-├── Aula 4/              # Transações distribuídas, Sagas, CQRS e Template System Design 04
-├── Aula 5/              # Engenharia de Release, Imagens OCI e Template System Design 05
-├── Aula 6/              # Observabilidade, Telemetria Distribuída e Template System Design 06
+├── Aula02/              # Otimização de bancos, índices, UUIDv7, Locks e Template System Design 02
+├── Aula03/              # Transactional Outbox Pattern, Kafka e Template System Design 03
+├── Aula04/              # Transações distribuídas, Sagas, CQRS e Template System Design 04
+├── Aula05/              # Engenharia de Release, Imagens OCI e Template System Design 05
+├── Aula06/              # Observabilidade, Telemetria Distribuída e Template System Design 06
 ├── ProjetoBonus/        # MeliCore Checkout Engine (Spring Boot + Temporal + Postgres + Kafka)
 ├── .gitignore           # Arquivos e pastas ignorados pelo Git
 └── README.md            # Documentação do repositório
