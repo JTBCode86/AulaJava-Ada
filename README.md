@@ -65,14 +65,19 @@ O repositório está organizado modularmente por aulas, contendo os desafios pr�
 
 ```text
 .
-├── Aula02/              # Otimização de bancos, índices, UUIDv7, Locks e Template System Design 02
-├── Aula03/              # Transactional Outbox Pattern, Kafka e Template System Design 03
-├── Aula04/              # Transações distribuídas, Sagas, CQRS e Template System Design 04
-├── Aula05/              # Engenharia de Release, Imagens OCI e Template System Design 05
-├── Aula06/              # Observabilidade, Telemetria Distribuída e Template System Design 06
-├── ProjetoBonus/        # MeliCore Checkout Engine (Spring Boot + Temporal + Postgres + Kafka)
-├── .gitignore           # Arquivos e pastas ignorados pelo Git
-└── README.md            # Documentação do repositório
+├── Aula02/                  # Otimização de bancos, índices, UUIDv7, Locks e System Design 02
+│   └── desafio/             # Desafios práticos da Aula 02: Checkout Resilience Demo
+├── Aula03/                  # Transactional Outbox Pattern, Kafka e System Design 03
+│   └── desafio/             # Desafios práticos da Aula 03: Benchmark de Identificadores PostgreSQL
+├── Aula04/                  # Transações distribuídas, Sagas, CQRS e System Design 04
+│   └── desafio/             # Desafios práticos da Aula 04: Arquitetura Event-Driven
+├── Aula05/                  # Engenharia de Release, Imagens OCI e System Design 05
+│   └── desafio/             # Desafios práticos da Aula 05: Serviço de Checkout
+├── Aula06/                  # Observabilidade, Telemetria Distribuída e System Design 06
+│   └── desafio/             # Desafios práticos da Aula 06: Observabilidade & Teste de Carga
+├── ProjetoBonus/            # MeliCore Checkout Engine (Spring Boot + Temporal + Postgres + Kafka)
+├── .gitignore               # Arquivos e pastas ignorados pelo Git
+└── README.md                # Documentação principal do repositório
 ```
 
 ---
