@@ -100,52 +100,55 @@ O **MeliCore Checkout Engine** foi projetado especificamente para suportar cená
 ## 📁 Estrutura de Pastas
 
 ```text
-meli-core-engine/
-├── docker-compose.yml
-├── Dockerfile
-├── pom.xml
+ProjetoBonus/
 ├── README.md
-└── src/
-    ├── main/
-    │   ├── java/
-    │   │   └── com/
-    │   │       └── melicore/
-    │   │           └── engine/
-    │   │               ├── CheckoutEngineApplication.java
-    │   │               ├── config/
-    │   │               │   ├── KafkaConfig.java
-    │   │               │   ├── KafkaTopicConfig.java
-    │   │               │   ├── OpenTelemetryConfig.java
-    │   │               │   └── TemporalConfig.java
-    │   │               ├── controller/
-    │   │               │   └── CheckoutController.java
-    │   │               ├── domain/
-    │   │               │   ├── Order.java
-    │   │               │   └── OutboxEvent.java
-    │   │               ├── repository/
-    │   │               │   ├── OrderRepository.java
-    │   │               │   └── OutboxRepository.java
-    │   │               ├── scheduler/
-    │   │               │   └── OutboxPoller.java
-    │   │               └── saga/
-    │   │                   ├── OrderWorkflow.java
-    │   │                   ├── OrderWorkflowImpl.java
-    │   │                   ├── OrderActivities.java
-    │   │                   └── OrderActivitiesImpl.java
-    │   └── resources/
-    │       ├── application.properties
-    │       └── db/
-    │           └── migration/
-    │               └── V1__create_outbox_and_orders_tables.sql
-    └── test/
-        ├── java/
-        │   └── com/
-        │       └── melicore/
-        │           └── engine/
-        │               ├── CheckoutEngineApplicationTests.java
-        │               └── OutboxPollerTest.java
-        └── resources/
-            └── application-test.properties
+└── meli-core-engine/
+	├── .dockerignore 
+	├── Dockerfile
+	├── docker-compose.yml
+	├── k6-spike-test.js
+	├── pom.xml
+	└── src/
+		├── main/
+		│   ├── java/
+		│   │   └── com/
+		│   │       └── melicore/
+		│   │           └── engine/
+		│   │               ├── CheckoutEngineApplication.java
+		│   │               ├── config/
+		│   │               │   ├── KafkaConfig.java
+		│   │               │   ├── KafkaTopicConfig.java
+		│   │               │   ├── OpenTelemetryConfig.java
+		│   │               │   └── TemporalConfig.java
+		│   │               ├── controller/
+		│   │               │   └── CheckoutController.java
+		│   │               ├── domain/
+		│   │               │   ├── Order.java
+		│   │               │   └── OutboxEvent.java
+		│   │               ├── repository/
+		│   │               │   ├── OrderRepository.java
+		│   │               │   └── OutboxRepository.java
+		│   │               ├── scheduler/
+		│   │               │   └── OutboxPoller.java
+		│   │               └── saga/
+		│   │                   ├── OrderWorkflow.java
+		│   │                   ├── OrderWorkflowImpl.java
+		│   │                   ├── OrderActivities.java
+		│   │                   └── OrderActivitiesImpl.java
+		│   └── resources/
+		│       ├── application.properties
+		│       └── db/
+		│           └── migration/
+		│               └── V1__create_outbox_and_orders_tables.sql
+		└── test/
+			├── java/
+			│   └── com/
+			│       └── melicore/
+			│           └── engine/
+			│               ├── CheckoutEngineApplicationTests.java
+			│               └── OutboxPollerTest.java
+			└── resources/
+				└── application-test.properties
 ```
 
 ---
