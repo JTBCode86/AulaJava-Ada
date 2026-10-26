@@ -8,6 +8,7 @@ Um sistema de checkout de microsserviços de alto desempenho, resiliente e orien
 - [Descrição](#-descrição)
 - [Tecnologias Utilizadas](#-tecnologias-utilizadas)
 - [Arquitetura](#-arquitetura)
+- [Preparação para Alta Volumetria (Cenário Black Friday)](#-preparação-para-alta-volumetria-cenário-black-friday)
 - [Estrutura de Pastas](#-estrutura-de-pastas)
 - [Guia de Execução Passo a Passo](#-guia-de-execução-passo-a-passo)
 - [Execução dos Testes Integrados e Unitários](#-execução-dos-testes-integrados-e-unitários)
@@ -82,6 +83,17 @@ Ele resolve o problema de escrita dupla (*dual-write problem*) entre fronteiras 
 ### Padrões de Projeto Chave
 * **Padrão SAGA (Baseado em Orquestrador)**: Gerenciado pelo Temporal.io. Coordena sequencialmente atividades distribuídas e executa ações de compensação caso qualquer etapa falhe.
 * **Padrão Transactional Outbox**: Evita a inconsistência de dados causada por falhas parciais ao gravar no banco de dados e publicar simultaneamente num broker de mensagens.
+
+---
+
+## ⚡ Preparação para Alta Volumetria (Cenário Black Friday)
+
+O **MeliCore Checkout Engine** foi projetado especificamente para suportar cenários de altíssima concorrência e picos de tráfego intensos (como a Black Friday operando a 5.000+ TPS), endereçando diretamente os principais vetores de falha em sistemas distribuídos:
+
+* **Proteção contra Falhas de Terceiros e Indisponibilidade**: Em picos de vendas, gateways de pagamento externos ou serviços de estoque podem apresentar alta latência ou instabilidade. A orquestração do **Temporal.io** garante resiliência através de retentativas automáticas (*backoff*) e execução imutável de transações compensatórias em SAGA (ex: estornos e reversões automáticas de reservas) caso o fluxo falhe em qualquer etapa intermediária.
+* **Eliminação do Problema de *Dual-Write***: Ao persistir a alteração do pedido e o evento correspondente dentro da mesma transação relacional PostgreSQL utilizando o **Padrão Transactional Outbox**, o sistema assegura atomicidade: nenhum evento de checkout é perdido antes de ser entregue ao broker, mesmo diante de falhas de rede ou reinicialização dos containers.
+* **Desacoplamento e Escala Assíncrona**: O desacoplamento do `OutboxPoller` em conjunto com o **Apache Kafka** isola a escrita síncrona de baixa latência da API das rotinas de processamento assíncrono dos consumidores, protegendo a aplicação contra a saturação do pool de conexões HTTP e do banco de dados.
+* **Diagnóstico e Observabilidade em Produção**: A instrumentação nativa com **OpenTelemetry** gera correlação de rastreio distribuído (`traceparent` W3C) ao longo dos microsserviços e eventos assíncronos, permitindo aos times de SRE identificar rapidamente gargalos de latência (p99) e saturação de recursos (Métricas RED/USE).
 
 ---
 
@@ -277,8 +289,8 @@ Todas as ordens e workflows SAGA processados podem ser inspecionados em tempo re
   ```bash
   docker-compose restart checkout-engine
   ```
-
 ---
 
-👤 **Autor**  
-Desenvolvido por Jean Barbosa ([@JTBCode86](https://github.com/JTBCode86)).
+## 📝 Licença & Autoria 
+* Projeto desenvolvido para fins educacionais e de demonstração de arquitetura de alta escala.
+* **Autor**: Jean Barbosa ([@JTBCode86](https://github.com/JTBCode86)).
