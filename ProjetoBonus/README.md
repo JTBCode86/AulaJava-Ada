@@ -29,8 +29,6 @@ Ele resolve o problema de escrita dupla (*dual-write problem*) entre fronteiras 
 
 ---
 
----
-
 ## 🎥 Demonstração em Ação
 
 *Abaixo, um fluxo E2E a ser disparado via API e orquestrado em tempo real pelo motor SAGA do Temporal.io:*
