@@ -29,6 +29,16 @@ Ele resolve o problema de escrita dupla (*dual-write problem*) entre fronteiras 
 
 ---
 
+---
+
+## 🎥 Demonstração em Ação
+
+*Abaixo, um fluxo E2E a ser disparado via API e orquestrado em tempo real pelo motor SAGA do Temporal.io:*
+
+<p align="center">
+  <img src="./docs/demo-melicore.gif" alt="MeliCore Checkout Engine Demo" width="100%">
+</p>
+
 ## 🛠 Tecnologias Utilizadas
 
 * **Linguagem / Framework**: Java 17, Spring Boot 3.x, Spring Data JPA, Spring Kafka
@@ -101,9 +111,11 @@ O **MeliCore Checkout Engine** foi projetado especificamente para suportar cená
 
 ```text
 ProjetoBonus/
+├── docs/
+│   └── demo-melicore.gif
 ├── README.md
 └── meli-core-engine/
-	├── .dockerignore 
+	├── .dockerignore
 	├── Dockerfile
 	├── docker-compose.yml
 	├── k6-spike-test.js
