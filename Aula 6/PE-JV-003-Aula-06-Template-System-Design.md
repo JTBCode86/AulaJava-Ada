@@ -1,4 +1,4 @@
-# Template de System Design: Aula 06 - Observabilidade & Diagnóstico em Produção
+# System Design: Aula 06 - Observabilidade & Diagnóstico em Produção
 
 > **Contexto do Cenário: O Checkout que Trava sem Dar Erro**
 >

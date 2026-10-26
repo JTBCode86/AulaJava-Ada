@@ -1,4 +1,4 @@
-# Template de System Design: Aula 05 - Containers, CI/CD & Deploy sem Downtime
+# System Design: Aula 05 - Containers, CI/CD & Deploy sem Downtime
 
 > **Contexto do Cenário: O Deploy que Quebrou o Checkout e o Rollback Impossível**
 >

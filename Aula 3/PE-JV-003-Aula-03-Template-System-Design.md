@@ -1,4 +1,4 @@
-# Template de System Design: Aula 03 - Banco de Dados em Larga Escala
+# System Design: Aula 03 - Banco de Dados em Larga Escala
 
 > **Contexto do Cenário: Checkout na Black Friday**
 >
