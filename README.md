@@ -61,10 +61,10 @@ O repositório está organizado modularmente por aulas, contendo os desafios pr�
 
 ---
 
-## 🗂️ Estrutura do Projeto
+## 🗂️ Estrutura das Pastas
 
 ```text
-.
+AulaJava-Ada/
 ├── Aula02/                  # Otimização de bancos, índices, UUIDv7, Locks e System Design 02
 │   └── desafio/             # Desafios práticos da Aula 02: Checkout Resilience Demo
 ├── Aula03/                  # Transactional Outbox Pattern, Kafka e System Design 03
