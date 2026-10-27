@@ -124,7 +124,7 @@ O **MeliCore Checkout Engine** foi projetado especificamente para suportar cená
 ProjetoBonus/
 ├── docs/
 │   ├── demo-melicore.gif
-│   └── demo-melicore-loadtest.gif
+│   └── demo-melicore-part2.gif
 ├── README.md
 └── meli-core-engine/
 	├── .dockerignore
