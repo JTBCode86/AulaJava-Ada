@@ -215,17 +215,30 @@ docker exec -it melicore-kafka kafka-topics --bootstrap-server localhost:29092 -
 ```
 
 ### 4. Executar o Teste do Checkout Ponta a Ponta (E2E)
-Dispare uma transação isolada de checkout via `curl` utilizando o payload JSON:
+Dispare uma transação isolada de checkout via `curl` utilizando o payload JSON de acordo com o seu terminal:
 
+#### 🐧 Linux / macOS / Git Bash:
 ```bash
 curl -X POST http://localhost:8080/api/v1/checkout \
   -H "Content-Type: application/json" \
   -d '{
-    "amount": 150.00,
     "customerId": "JEAN-BARBOSA",
     "productId": "PROD-MELI-01",
-    "quantity": 2
+    "quantity": 2,
+    "amount": 150.00
   }'
+```
+
+#### 🪟 Windows (Prompt de Comando / CMD):
+```cmd
+curl -X POST http://localhost:8080/api/v1/checkout -H "Content-Type: application/json" -d "{\"customerId\": \"JEAN-BARBOSA\", \"productId\": \"PROD-MELI-01\", \"quantity\": 2, \"amount\": 150.00}"
+```
+
+#### ⚡ Windows (PowerShell):
+```powershell
+curl -X POST http://localhost:8080/api/v1/checkout `
+  -H "Content-Type: application/json" `
+  -d '{"customerId": "JEAN-BARBOSA", "productId": "PROD-MELI-01", "quantity": 2, "amount": 150.00}'
 ```
 
 ---
