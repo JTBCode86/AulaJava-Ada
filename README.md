@@ -40,11 +40,11 @@ O repositório está organizado modularmente por aulas, contendo os desafios pr�
 
 | Pasta / Aula | Tema Principal & Contexto de Negócio | Desafio Técnico / Arquitetural |
 | :--- | :--- | :--- |
-| [**`Aula02/`**](./Aula02/) | Banco de Dados, Índices & Concorrência | Otimização de consultas lentas (`EXPLAIN`), mitigação de *page splits* com UUIDv7, uso de Locks Pessimistas sob alta disputa de estoque e estratégias de persistência poliglota. |
-| [**`Aula03/`**](./Aula03/) | Arquitetura Orientada a Eventos & Consistência | Resolução do problema de *Dual Write* utilizando o padrão **Transactional Outbox**, CDC com Debezium e mensageria assíncrona. |
-| [**`Aula04/`**](./Aula04/) | Transações Distribuídas & Resiliência | Orquestração de Sagas, compensações automáticas sem rollback físico, CQRS para desacoplamento de leitura/escrita e estratégias de testes de falha (Chaos Engineering). |
-| [**`Aula05/`**](./Aula05/) | Guia Prático de Engenharia de Release | Conteinerização OCI, otimização de imagens Java com Paketo Buildpacks e Distroless, estratégias de CI/CD, garantia de *Reproducible Builds* e deploys *zero-downtime*. |
-| [**`Aula06/`**](./Aula06/) | Observabilidade & Diagnóstico em Produção | Diagnóstico de gargalos distribuídos sem acesso a shell em imagens *Distroless*, correlação de logs com W3C `traceparent`, amostragem de traces (*Head* vs *Tail Sampling*), métricas RED/USE, prevenção de explosão de cardinalidade e conformidade com a LGPD. |
+| [**`Aula02/`**](./Aula02/) | APIs Resilientes & Integração de Checkout | Implementação de resiliência com Resilience4j (Circuit Breaker, TimeLimiter, Bulkhead, RateLimiter) e garantia de idempotência com `Idempotency-Key`[cite: 61]. |
+| [**`Aula03/`**](./Aula03/) | Banco de Dados em Larga Escala & Concorrência | Otimização de consultas lentas (`EXPLAIN`), mitigação de *page splits* com UUIDv7, uso de Locks Otimistas e Pessimistas sob alta disputa de estoque e persistência poliglota[cite: 62]. |
+| [**`Aula04/`**](./Aula04/) | Microsserviços, Sagas & Consistência Distribuída | Orquestração de Sagas, transações compensatórias sem rollback físico, resolução de *Dual Write* via Transactional Outbox (Debezium/CDC) e CQRS[cite: 63]. |
+| [**`Aula05/`**](./Aula05/) | Containers, CI/CD & Deploy sem Downtime | Empacotamento OCI com imagens *Distroless*, esteira imutável, migração de banco sem downtime usando o padrão *Expand-Contract* e *Canary Release*[cite: 64]. |
+| [**`Aula06/`**](./Aula06/) | Observabilidade & Diagnóstico em Produção | Rastreabilidade distribuída com OpenTelemetry e W3C `traceparent`, amostragem (*Head* vs *Tail Sampling*), métricas RED/USE e pseudonimização alinhada à LGPD[cite: 65]. |
 | [**`ProjetoBonus/`**](./ProjetoBonus/) | **MeliCore Checkout Engine (Projeto Integrador)** | Arquitetura de microsserviços de alto desempenho, resiliente e orientada a eventos. Implementação do **Padrão SAGA** via **Temporal.io**, **Transactional Outbox Pattern** com PostgreSQL e mensageria confiável via **Apache Kafka** com suporte a Dead Letter Queue (**DLQ**). |
 
 ---
