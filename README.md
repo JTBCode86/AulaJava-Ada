@@ -9,7 +9,7 @@ Este repositório destina-se a armazenar os códigos, desafios de engenharia, de
 - [Entregáveis & Templates de System Design](#-entregáveis--templates-de-system-design)
 - [Trilha de Aulas e Desafios de Engenharia](#-trilha-de-aulas-e-desafios-de-engenharia)
 - [Tecnologias e Ferramentas](#️-tecnologias-e-ferramentas)
-- [Estrutura do Projeto](#️-estrutura-do-projeto)
+- [Estrutura das Pastas](#️-estrutura-das-pastas)
 - [Como Executar os Projetos](#-como-executar-os-projetos)
 
 ---
