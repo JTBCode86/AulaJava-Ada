@@ -1,6 +1,7 @@
 package com.melicore.engine.controller;
 
 import com.melicore.engine.saga.OrderWorkflow;
+import io.temporal.api.common.v1.WorkflowExecution;
 import io.temporal.client.WorkflowClient;
 import io.temporal.client.WorkflowOptions;
 import org.springframework.http.ResponseEntity;
@@ -18,12 +19,16 @@ public class CheckoutController {
         this.workflowClient = workflowClient;
     }
 
+    // Record para mapear corretamente o JSON enviado pelo k6
+    public record CheckoutRequest(
+            Double amount,
+            String customerId,
+            String productId,
+            Integer quantity
+    ) {}
+
     @PostMapping
-    public ResponseEntity<String> processCheckout(
-            @RequestParam Double amount,
-            @RequestParam(required = false, defaultValue = "CUSTOMER-DEFAULT") String customerId,
-            @RequestParam(defaultValue = "PROD-123") String productId,
-            @RequestParam(defaultValue = "1") int quantity) {
+    public ResponseEntity<String> processCheckout(@RequestBody CheckoutRequest request) {
         
         String orderId = UUID.randomUUID().toString();
 
@@ -36,14 +41,16 @@ public class CheckoutController {
         // Cria o stub do Workflow SAGA
         OrderWorkflow workflow = workflowClient.newWorkflowStub(OrderWorkflow.class, options);
 
-        // Executa a SAGA de ponta a ponta gerida pelo Temporal
-        // (Reserva de Stock -> Processamento de Pagamento com Outbox -> Emissão de Etiqueta)
-        String result = workflow.processOrder(orderId, productId, quantity, amount);
+        // DISPARA O WORKFLOW DE FORMA ASSÍNCRONA (Não bloqueia a thread HTTP!)
+        WorkflowExecution execution = WorkflowClient.start(
+                workflow::processOrder,
+                orderId,
+                request.productId() != null ? request.productId() : "PROD-MELI-01",
+                request.quantity() != null ? request.quantity() : 1,
+                request.amount() != null ? request.amount() : 150.00
+        );
 
-        if (result.startsWith("SUCCESS")) {
-            return ResponseEntity.ok(result);
-        } else {
-            return ResponseEntity.badRequest().body(result);
-        }
+        // Retorna imediatamente 202 Accepted com o ID do workflow gerado
+        return ResponseEntity.accepted().body("SUCCESS: Workflow started with ID " + execution.getWorkflowId());
     }
 }

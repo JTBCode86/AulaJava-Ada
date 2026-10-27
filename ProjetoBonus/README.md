@@ -6,12 +6,13 @@ Um sistema de checkout de microsserviços de alto desempenho, resiliente e orien
 
 ## 📌 Sumário
 - [Descrição](#-descrição)
+- [Demonstração em Ação](#-demonstração-em-ação)
 - [Tecnologias Utilizadas](#-tecnologias-utilizadas)
 - [Arquitetura](#-arquitetura)
 - [Preparação para Alta Volumetria (Cenário Black Friday)](#-preparação-para-alta-volumetria-cenário-black-friday)
 - [Estrutura de Pastas](#-estrutura-de-pastas)
 - [Guia de Execução Passo a Passo](#-guia-de-execução-passo-a-passo)
-- [Execução dos Testes Integrados e Unitários](#-execução-dos-testes-integrados-e-unitários)
+- [Execução dos Testes Integrados, Unitários e de Carga](#-execução-dos-testes-integrados-unitários-e-de-carga)
 - [Visualização de Ordens Processadas (Portal Temporal)](#-visualização-de-ordens-processadas-portal-temporal)
 - [Trade-offs de Arquitetura](#-trade-offs-de-arquitetura)
 - [Resolução de Problemas (Troubleshooting)](#-resolução-de-problemas-troubleshooting)
@@ -31,11 +32,23 @@ Ele resolve o problema de escrita dupla (*dual-write problem*) entre fronteiras 
 
 ## 🎥 Demonstração em Ação
 
-*Abaixo, um fluxo E2E a ser disparado via API e orquestrado em tempo real pelo motor SAGA do Temporal.io:*
+Abaixo estão os registros visuais do comportamento e da observabilidade do motor SAGA sob cenários funcionais e de estresse:
+
+### 1. Teste Funcional Isolado (Fluxo de Ordem Única)
+Demonstração do processamento de uma requisição individual de checkout via API, permitindo rastrear passo a passo a execução da SAGA no painel do Temporal UI.
 
 <p align="center">
-  <img src="./docs/demo-melicore.gif" alt="MeliCore Checkout Engine Demo" width="100%">
+  <img src="./docs/demo-melicore.gif" alt="MeliCore Checkout Engine Demo - Ordem Única" width="100%">
 </p>
+
+### 2. Teste de Carga & Alta Concorrência em Lote (k6)
+Demonstração da resiliência da arquitetura assíncrona (`WorkflowClient.start` respondendo `202 Accepted`). À esquerda, o **k6** injeta picos de carga com até 50 VUs; à direita, o **Temporal Web UI** acompanha a transição dinâmica e massiva das SAGAs do estado limpo para `RUNNING` e `COMPLETED` em tempo real sem degradação do sistema.
+
+<p align="center">
+  <img src="./docs/demo-melicore-part2.gif" alt="MeliCore Checkout Engine Demo - Load Test k6" width="100%">
+</p>
+
+---
 
 ## 🛠 Tecnologias Utilizadas
 
@@ -45,7 +58,7 @@ Ele resolve o problema de escrita dupla (*dual-write problem*) entre fronteiras 
 * **Mensageria & Streaming**: Apache Kafka, Embedded Kafka (para testes), Zookeeper
 * **Containerização**: Docker, Docker Compose
 * **Observabilidade & Resiliência**: Resilience4j, OpenTelemetry (OTLP)
-* **Testes**: JUnit 5, Embedded Kafka, Spring Boot Test
+* **Testes & Carga**: JUnit 5, Embedded Kafka, Spring Boot Test, k6 (Grafana)
 
 ---
 
@@ -64,7 +77,7 @@ Ele resolve o problema de escrita dupla (*dual-write problem*) entre fronteiras 
 |  - OpenTelemetry (Traces & Métricas)                                           |
 +------------------+------------------------------------+-------------------------+
                    |                                    |
-                   v (Transação de Banco)                v (Workflow SAGA)
+                   v (Transação de Banco)                v (Workflow SAGA Assíncrono)
 +------------------------------------+    +---------------------------------------+
 |        PostgreSQL Database         |    |              Temporal.io              |
 |  - Tabela: orders                  |    |  - Workflow: OrderWorkflow            |
@@ -110,7 +123,8 @@ O **MeliCore Checkout Engine** foi projetado especificamente para suportar cená
 ```text
 ProjetoBonus/
 ├── docs/
-│   └── demo-melicore.gif
+│   ├── demo-melicore.gif
+│   └── demo-melicore-loadtest.gif
 ├── README.md
 └── meli-core-engine/
 	├── .dockerignore
@@ -201,58 +215,51 @@ docker exec -it melicore-kafka kafka-topics --bootstrap-server localhost:29092 -
 ```
 
 ### 4. Executar o Teste do Checkout Ponta a Ponta (E2E)
-Dispare uma transação de checkout via `curl`:
+Dispare uma transação isolada de checkout via `curl` utilizando o payload JSON:
 
 ```bash
-curl -X POST "http://localhost:8080/api/v1/checkout?amount=150.00&customerId=JEAN-BARBOSA&productId=PROD-MELI-01&quantity=2"
-```
-
-**Resposta HTTP Esperada:**
-```text
-SUCCESS - Pedido processado e etiqueta gerada: MELI-LABEL-2992C450
+curl -X POST http://localhost:8080/api/v1/checkout \
+  -H "Content-Type: application/json" \
+  -d '{
+    "amount": 150.00,
+    "customerId": "JEAN-BARBOSA",
+    "productId": "PROD-MELI-01",
+    "quantity": 2
+  }'
 ```
 
 ---
 
-## 🧪 Execução dos Testes Integrados e Unitários
+## 🧪 Execução dos Testes Integrados, Unitários e de Carga
 
-O projeto conta com uma suíte de testes de integração automatizada que valida o carregamento do contexto da aplicação, persitência de dados e a publicação de mensagens via **Transactional Outbox**.
+### 1. Testes Automatizados (Unidade e Integração)
 
-### Isolamento do Ambiente de Testes
-Para garantir a execução ágil dos testes sem depender de infraestruturas externas ativas (Docker):
-* **Perfil `@ActiveProfiles("test")`**: Utiliza as configurações isoladas presentes em `src/test/resources/application-test.properties`.
-* **Banco de Dados em Memória (H2)**: Substitui o PostgreSQL real durante os testes, aplicando DDL automático.
-* **Kafka Embarcado (`@EmbeddedKafka`)**: Inicia um broker de Kafka em memória dinamicamente para validar o envio e consumo de tópicos.
-* **Temporal Silenciado**: O registo de workers do Temporal é condicionado via `@ConditionalOnProperty(name = "temporal.worker.enabled", havingValue = "true")`, evitando tentativas de conexão à porta 7233 em testes locais.
-* **OpenTelemetry Resiliente**: Possui tratamento contra registos globais duplicados durante o ciclo de testes na mesma JVM.
+O projeto conta com uma suíte de testes automatizada que valida o carregamento do contexto da aplicação, persistência de dados e a publicação de mensagens via **Transactional Outbox**.
 
-### Como Executar os Testes
+#### Isolamento do Ambiente de Testes
+* **Perfil `@ActiveProfiles("test")`**: Utiliza as configurações isoladas em `src/test/resources/application-test.properties`.
+* **Banco de Dados em Memória (H2)**: Substitui o PostgreSQL real durante os testes.
+* **Kafka Embarcado (`@EmbeddedKafka`)**: Inicia um broker de Kafka em memória para validar o envio/consumo dos tópicos.
+* **Temporal Silenciado**: O registo de workers do Temporal é condicionado via `@ConditionalOnProperty(name = "temporal.worker.enabled", havingValue = "true")`.
 
-#### Via Linha de Comando (Maven Wrapper / Maven)
-Execute o comando abaixo na raiz do projeto:
-
+#### Como Executar via Terminal:
 ```bash
 ./mvnw test
 ```
-*Se preferir usar o Maven instalado localmente:*
+
+---
+
+### 2. Teste de Carga em Lote (k6 Spike Test via Docker)
+
+Para simular o cenário de alta concorrência da Black Friday e validar a resiliência do processamento assíncrono das SAGAs no Temporal:
+
 ```bash
-mvn test
+docker run --rm -i \
+  --add-host=host.docker.internal:host-gateway \
+  grafana/k6 run - < k6-spike-test.js
 ```
 
-#### Via IDE (IntelliJ IDEA)
-1. Navegue até ao diretório **`src/test/java`**.
-2. Clique com o botão direito em cima do pacote **`com.melicore.engine`** (ou da pasta `java`).
-3. Selecione a opção **Run 'All Tests'** (ou pressione `Ctrl + Shift + F10` / `Cmd + Shift + R`).
-
-### Cenários de Teste Cobertos
-1. **`CheckoutEngineApplicationTests`**:
-   * Valida a inicialização completa do contexto do Spring Boot.
-   * Confirma a correta instanciação e injeção de Beans (JPA Data, Spring Kafka, OpenTelemetry e componentes da aplicação).
-2. **`OutboxPollerTest`**:
-   * Simula a gravação de eventos pendentes (`processed = false`) na tabela `outbox_events`.
-   * Executa a rotina agendada do `OutboxPoller`.
-   * Verifica a publicação das mensagens no tópico do Kafka embarcado (`orders.events`).
-   * Assegura que o estado do evento é devidamente atualizado para processado (`processed = true`).
+> **Nota de Performance**: O script de estresse injeta múltiplos VUs (até 50 usuários virtuais simultâneos). Por o endpoint ser assíncrono (`202 Accepted`), a API responde de imediato enquanto o Temporal gerencia a fila `CHECKOUT_TASK_QUEUE` em segundo plano sem travar o servidor.
 
 ---
 
@@ -262,10 +269,10 @@ Todas as ordens e workflows SAGA processados podem ser inspecionados em tempo re
 
 1. Acesse no seu navegador: **`http://localhost:8233`**
 2. No menu principal, clique em **Workflows**.
-3. Na lista, você encontrará o fluxo `OrderWorkflow` registrado com o **Workflow ID** (ex: `order-1efd1eba-b8b2-4694-80af-407a60fed928`).
+3. Na lista, você encontrará o fluxo `OrderWorkflow` registrado com o **Workflow ID** (ex: `order-756e3a35-fa08-49e0-a413-bee8db9be541`).
 4. **Status das Ordens**:
    * **`COMPLETED`**: A ordem foi processada com sucesso por todas as etapas (Estoque $\rightarrow$ Pagamento $\rightarrow$ Envios).
-   * **`RUNNING`**: O workflow está atualmente em execução.
+   * **`RUNNING`**: O workflow está atualmente em execução ou na fila de processamento.
    * **`FAILED` / `TERMINATED`**: Ocorreu uma falha no fluxo e as compensações de SAGA foram acionadas.
 5. Clique sobre qualquer ID de workflow para visualizar o histórico detalhado de eventos, parâmetros de entrada/saída, tempos de resposta de cada atividade e árvore de execução de compensação.
 
