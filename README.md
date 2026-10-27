@@ -2,6 +2,17 @@
 
 Este repositório destina-se a armazenar os códigos, desafios de engenharia, decisões arquiteturais e projetos práticos desenvolvidos durante a especialização em **Java e Arquitetura de Sistemas** ministrada pela **Ada Tech**.
 
+<p align="center">
+  <img src="https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white" alt="Java">
+  <img src="https://img.shields.io/badge/Spring_Boot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white" alt="Spring Boot">
+  <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL">
+  <img src="https://img.shields.io/badge/Apache_Kafka-231F20?style=for-the-badge&logo=apachekafka&logoColor=white" alt="Kafka">
+  <img src="https://img.shields.io/badge/Debezium-FF6B6D?style=for-the-badge&logo=debezium&logoColor=white" alt="Debezium">
+  <img src="https://img.shields.io/badge/Temporal-00C7B7?style=for-the-badge&logo=temporal&logoColor=white" alt="Temporal">
+  <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker">
+  <img src="https://img.shields.io/badge/Kubernetes-326CE5?style=for-the-badge&logo=kubernetes&logoColor=white" alt="Kubernetes">
+</p>
+
 ---
 
 ## 📌 Sumário
