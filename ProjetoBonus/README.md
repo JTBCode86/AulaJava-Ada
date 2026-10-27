@@ -192,14 +192,14 @@ docker-compose down -v
 docker-compose up --build -d
 ```
 
-### 2. Verificar a Saúde dos Contentores
-Certifique-se de que todos os contentores estão com estado **Up**:
+### 2. Verificar a Saúde dos Conteiners
+Certifique-se de que todos os conteiners estão com estado **Up**:
 
 ```bash
 docker-compose ps
 ```
 
-Contentores esperados:
+conteiners esperados:
 * `melicore-checkout-engine` (Porta `8080`)
 * `melicore-postgres` (Porta `5432`)
 * `melicore-kafka` (Porta `29092`)
